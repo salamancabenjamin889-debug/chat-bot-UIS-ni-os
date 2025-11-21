@@ -1,0 +1,1037 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>🌟 Asistente Explorador de la UIS (¡Aventura!) 🌟</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        /* 🌈 PALETA INFANTIL VIVA 🎨 */
+        :root {
+            --color-uis-green: #4CAF50; /* Verde principal, más brillante */
+            --color-uis-green-hover: #45A049;
+            
+            --color-bg: #FFF8E1; /* Fondo de la página: Amarillo pastel muy suave */
+            --color-card-bg: #FFFFFF; /* Fondo del chat/login: Blanco puro */
+            
+            --color-text: #333333; /* Texto principal: Gris oscuro amigable */
+            --color-text-secondary: #777777; 
+            --color-border: #E0E0E0; /* Borde muy suave */
+
+            /* Colores de las burbujas */
+            --bubble-bot: #E1F5FE; /* Azul Cielo para el Bot */
+            --bubble-user: #FFECB3; /* Amarillo Suave para el Usuario */
+            
+            /* Colores de Acentos Vivos */
+            --accent-red: #F44336;
+            --accent-blue: #2196F3;
+        }
+
+        /* Estilos Base */
+        body {
+            font-family: 'Comic Sans MS', 'Arial Rounded MT Bold', sans-serif; /* Fuente más juguetona */
+            background-color: var(--color-bg);
+            margin: 0;
+            color: var(--color-text);
+        }
+
+        /* ************************************** */
+        /* CONTENEDOR CENTRAL/PRINCIPAL */
+        /* ************************************** */
+        #contenedorCentrador {
+            display: flex; 
+            flex-direction: column;
+            justify-content: flex-start;
+            align-items: center; 
+            min-height: 100vh; 
+            width: 100%;
+        }
+
+        .contenedor-principal {
+            background-color: var(--color-card-bg); 
+            max-width: 100%; 
+            width: 100%;
+            height: 100vh; 
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Sombra suave */
+            overflow: hidden;
+        }
+        
+        #cuestionario {
+            padding: 40px; 
+            border-radius: 20px;
+            max-width: 450px; 
+            height: auto;
+            text-align: center;
+            background-color: #E8F5E9; /* Verde claro suave para el login */
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+            margin: auto; 
+            border: 3px dashed var(--color-uis-green); /* Borde divertido */
+        }
+        
+        /* ************************************** */
+        /* LOGO y HEADER (AJUSTADO) */
+        /* ************************************** */
+        #logo-uis-login {
+            height: 100px; /* Un poco más pequeña */
+            width: auto;
+            margin-bottom: 15px;
+        }
+
+        #logo-uis-header {
+            height: 45px; 
+            width: auto;
+            margin-right: 15px; 
+            filter: drop-shadow(2px 2px 2px rgba(0,0,0,0.3)); /* Sombra para resaltar */
+        }
+        
+        /* REEMPLAZO DEL H2 POR UN DIV DE ENCABEZADO */
+        #chatHeader {
+            background-color: var(--accent-blue); /* Color azul más llamativo en el header */
+            color: white;
+            padding: 15px 10px; 
+            margin: 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between; /* Distribuye el espacio */
+            position: relative; 
+            font-size: 1.6em; 
+            font-weight: 900;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3); /* Sombra para el título */
+        }
+        
+        #chatHeader h2 {
+            /* Título principal dentro del header */
+            font-size: 1em; /* Utiliza el tamaño definido en el padre */
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            /* Permitir que el texto se centre */
+            flex-grow: 1; 
+            justify-content: center;
+        }
+
+        /* Menú de Acciones (Ajustado a la posición relativa del #chatHeader) */
+        #menuAccionesWrapperSuperior {
+            /* Eliminar position: absolute y usar Flexbox */
+            height: auto;
+            display: flex;
+            align-items: center;
+            /* Mantiene la separación con el título principal */
+            min-width: 50px; 
+            justify-content: flex-end;
+        }
+
+        #btnMenuAcciones {
+            background-color: transparent; 
+            color: white; 
+            border: none;
+            padding: 5px 10px; 
+            border-radius: 50%; 
+            font-size: 1.8em; 
+            cursor: pointer;
+            line-height: 1; 
+            transition: transform 0.2s;
+            text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+            z-index: 11; /* Asegura que esté sobre el menú desplegable */
+        }
+        #btnMenuAcciones:hover {
+            transform: scale(1.1);
+        }
+
+        #controlesSuperiores {
+            display: none; 
+            position: absolute; /* Usar absolute relativo al #chatHeader */
+            top: 65px; 
+            right: 5px; 
+            background-color: #fff;
+            border: 1px solid var(--color-border);
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            z-index: 10;
+            min-width: 180px;
+            flex-direction: column;
+            padding: 5px 0;
+        }
+        
+        #controlesSuperiores.active {
+            display: flex;
+        }
+        
+        #controlesSuperiores .btn-accion-secundaria {
+            color: var(--color-text);
+            /* Resetear estilos de botón general */
+            background: none;
+            border: none;
+            padding: 10px 15px;
+            text-align: left;
+            cursor: pointer;
+            font-size: 1em;
+            width: 100%;
+        }
+        #controlesSuperiores .btn-accion-secundaria:hover {
+            background-color: #EFEBE9; /* Gris muy claro al pasar el ratón */
+        }
+        #controlesSuperiores .btn-accion-secundaria.cerrar-sesion {
+            color: var(--accent-red); 
+        }
+
+        /* Input y Botones */
+        .input-registro {
+            width: 90%; 
+            padding: 12px; 
+            border: 2px solid var(--accent-blue);
+            border-radius: 10px;
+            font-size: 1em;
+            background-color: #ffffff; 
+            color: var(--color-text); 
+            margin-bottom: 12px;
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        #contenedorAutorizacion {
+            /* Mismo estilo, pero con colores más suaves */
+            width: 90%;
+            margin: 15px auto 15px auto;
+        }
+        #checkAutorizacion {
+            border: 2px solid var(--accent-red); /* Borde rojo */
+        }
+        #checkAutorizacion:checked {
+            background-color: var(--accent-red);
+            border-color: var(--accent-red);
+        }
+        #contenedorAutorizacion label {
+            font-size: 0.9em;
+            color: var(--color-text);
+            font-weight: 500;
+        }
+
+
+        button.primary-btn {
+            background-color: var(--accent-red); /* Botón rojo primario */
+            color: white; 
+            padding: 15px 30px; 
+            border: none;
+            border-radius: 10px; 
+            font-size: 1.1em; 
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 4px 0 var(--color-uis-green-hover); /* Sombra 3D */
+            transition: all 0.1s;
+        }
+        button.primary-btn:hover {
+            background-color: #E53935; 
+            box-shadow: 0 2px 0 var(--color-uis-green-hover); 
+            transform: translateY(2px); /* Efecto de hundimiento */
+        }
+        
+        /* ************************************** */
+        /* CHAT LOG y Burbujas */
+        /* ************************************** */
+        #historialChat {
+            flex-grow: 1;
+            padding: 20px 3%; 
+            overflow-y: auto;
+            background-color: #F8F8F8; /* Un gris muy claro para la zona de chat */
+        }
+        
+        .chat-bot {
+            background-color: var(--bubble-bot); 
+            color: var(--color-text);
+            padding: 15px 20px; 
+            border-radius: 20px 20px 20px 5px; /* Esquina redondeada abajo a la izquierda */
+            max-width: 85%; 
+            margin-bottom: 15px; 
+            float: left;
+            clear: both;
+            border: 1px solid #B3E5FC; /* Borde más amigable */
+            font-size: 1.1em; 
+            line-height: 1.4;
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+        }
+        .chat-bot h4 {
+            color: var(--accent-blue); 
+            margin-top: 0;
+            margin-bottom: 8px;
+            font-size: 1.3em; 
+            font-weight: 900;
+        }
+        .chat-user {
+            background-color: var(--bubble-user); 
+            color: var(--color-text);
+            padding: 12px 18px; 
+            border-radius: 20px 20px 5px 20px; /* Esquina redondeada abajo a la derecha */
+            max-width: 85%; 
+            margin-bottom: 15px;
+            float: right; 
+            clear: both;
+            font-size: 1em; 
+            box-shadow: 2px 2px 5px rgba(0,0,0,0.1);
+        }
+        .acciones-post-respuesta {
+             padding-right: 0 !important; 
+        }
+
+        /* ************************************** */
+        /* FOOTER Y BOTONES RÁPIDOS (¡TIPO CROMO!) */
+        /* ************************************** */
+        #opcionesFooter {
+            padding: 15px 3%; 
+            border-top: 3px solid #FFCDD2; /* Borde color pastel */
+            background-color: #FFFFFF; 
+            display: flex;
+            flex-direction: column;
+            gap: 10px; 
+        }
+
+        #opcionesMenu {
+            justify-content: center; /* Centrar los botones de opciones */
+            gap: 8px; 
+        }
+        
+        .opcion-btn {
+            background-color: var(--accent-red); /* Botón de opción rojo */
+            color: white; 
+            border: 2px solid var(--accent-red); 
+            padding: 8px 15px; 
+            border-radius: 25px; 
+            cursor: pointer;
+            font-size: 0.9em; 
+            font-weight: 700;
+            transition: all 0.2s; 
+            box-shadow: 0 3px 0 #D32F2F; /* Sombra 3D */
+            /* Cambiar los colores de los botones para que sean variados y divertidos */
+        }
+        /* Asignar colores diferentes a algunos botones para variedad */
+        #opcionesMenu button:nth-child(2) { background-color: var(--accent-blue); box-shadow: 0 3px 0 #1976D2; border-color: var(--accent-blue); }
+        #opcionesMenu button:nth-child(3) { background-color: #FFC107; box-shadow: 0 3px 0 #FF9800; border-color: #FFC107; color: #333; } /* Amarillo */
+        #opcionesMenu button:nth-child(4) { background-color: var(--color-uis-green); box-shadow: 0 3px 0 #388E3C; border-color: var(--color-uis-green); } /* Verde */
+        
+        .opcion-btn:hover {
+            transform: translateY(1px); 
+            box-shadow: 0 2px 0 var(--accent-red);
+            opacity: 0.9;
+        }
+
+        /* Contenedor de Entrada de Texto */
+        #inputChatContainer {
+            display: flex;
+            gap: 10px; 
+            align-items: flex-end; 
+        }
+
+        #inputMensaje {
+            flex-grow: 1;
+            padding: 12px 20px; 
+            border: 2px solid var(--accent-blue);
+            border-radius: 25px; 
+            font-size: 1.1em; 
+            background-color: #FFFFFF; 
+            color: var(--color-text);
+            box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        /* Botón de Enviar (Ícono Grande) */
+        #btnEnviar {
+            background-color: var(--color-uis-green);
+            color: white; 
+            border: none;
+            border-radius: 50%; 
+            width: 50px; /* Más grande */
+            height: 50px; /* Más grande */
+            font-size: 1.5em; /* Ícono más grande */
+            box-shadow: 0 4px 0 #388E3C; 
+        }
+        #btnEnviar:hover {
+            background-color: var(--color-uis-green-hover);
+             transform: translateY(2px);
+             box-shadow: 0 2px 0 #388E3C;
+        }
+
+        /* Reseña (mantener simple, con colores infantiles) */
+        #contenedorReseña {
+            background-color: #FFFDE7; /* Amarillo muy pálido */
+            border-top: 3px solid #FFCC80;
+        }
+        #reseñaCliente {
+            border: 2px solid #FFAB40; /* Naranja */
+            background-color: #FFFFFF;
+        }
+        
+    </style>
+</head>
+<body>
+    
+    <div id="contenedorCentrador">
+        
+        <div id="cuestionario">
+            
+            <div style="margin-bottom: 25px;">
+                <img id="logo-uis-login" src="Universidad_Industrial_de_Santander_logo.svg.png" alt="Logo UIS" > 
+                
+                <h2 style="color: var(--accent-blue); margin: 0; font-size: 2em; text-shadow: 1px 1px 0 #fff;">¡Bienvenido Explorador! 🚀</h2>
+            </div>
+
+            <p style="font-size: 1.2em; font-weight: 700; color: var(--accent-red);">¡Vamos a empezar esta aventura de conocimiento! 🗺️</p>
+            
+            <div id="alerta-inline" style="text-align: left; background-color: #FFCDD2; color: #D32F2F; border: 1px solid #FF5252; padding: 10px; border-radius: 5px; margin-bottom: 10px;"></div>
+
+            <input type="text" id="nombreUsuario" class="input-registro" placeholder="¿Cómo te llamas, campeón/a?" required>
+            
+            <input 
+                type="number" 
+                id="edadUsuario" 
+                class="input-registro" 
+                placeholder="¿Cuántos años tienes?" 
+                min="1"
+                max="99"
+                required
+            >
+            
+            <div id="contenedorAutorizacion">
+                <input type="checkbox" id="checkAutorizacion" required>
+                <label for="checkAutorizacion">Autorizo a usar mis datos para la aventura. (¡Pide permiso!) 🤝</label>
+            </div>
+            
+            <button class="primary-btn" onclick="animateButton(this); iniciarMenu();" style="margin-top: 10px; width: 90%;">¡Empezar a Explorar! ✨</button>
+        </div>
+
+        <div id="contenedorMenu" class="contenedor-principal" style="display: none;">
+            
+            <div id="chatHeader">
+                
+                <h2>
+                    <img id="logo-uis-header" src="Universidad_Industrial_de_Santander_logo.svg.png" alt="Logo UIS"> 
+                    El Mapa de la Aventura UIS 🧭
+                </h2>
+                
+                <div id="menuAccionesWrapperSuperior">
+                    <button id="btnMenuAcciones" onclick="animateButton(this); toggleAccionesMenu()">
+                        ⚙️
+                    </button>
+                    
+                    <div id="controlesSuperiores">
+                        <button type="button" class="btn-accion-secundaria" onclick="mostrarReseñaForm(); toggleAccionesMenu()">⭐ ¡Dibuja tu Comentario!</button>
+                        <button type="button" class="btn-accion-secundaria cerrar-sesion" onclick="volverAlInicio(); toggleAccionesMenu()">🚪 ¡Volver a Casa!</button>
+                    </div>
+                </div>
+            </div>
+            <div id="historialChat">
+                <div class="chat-bot" id="initial-greeting"></div>
+            </div>
+
+            <div id="opcionesFooter">
+                
+                <div id="opcionesMenu">
+                    <button class="opcion-btn" onclick="animateButton(this); limpiarChat(false)">🗑️ Limpiar Pizarra</button> 
+                    <button class="opcion-btn" onclick="animateButton(this); procesarSeleccion('horario', this.textContent)">⏰ ¿A qué hora abre el Parque?</button>
+                    <button class="opcion-btn" onclick="animateButton(this); procesarSeleccion('carreras_oferta', this.textContent)">📚 ¿Qué Juegos hay para aprender?</button>
+                    <button class="opcion-btn" onclick="animateButton(this); procesarSeleccion('historia_creacion', this.textContent)">🎂 ¿Cuándo nació la UIS?</button>
+                    <button class="opcion-btn" onclick="animateButton(this); procesarSeleccion('mision_vision', this.textContent)">✨ ¿Cuál es el Súper Poder de la UIS?</button>
+                    <button class="opcion-btn" onclick="animateButton(this); procesarSeleccion('ubicacion', this.textContent)">🗺️ ¿Dónde está el Tesoro?</button> 
+                    <button class="opcion-btn" onclick="animateButton(this); procesarSeleccion('contacto', this.textContent)">🗣️ ¿Con quién hablamos?</button> 
+                </div>
+
+                <div id="inputChatContainer">
+                    
+                    <input type="text" id="inputMensaje" placeholder="Escribe tu pregunta mágica aquí..." onkeypress="return manejarEnter(event)">
+                    <button id="btnEnviar" onclick="animateButton(this); enviarMensaje()">▶️</button>
+                </div>
+                
+            </div>
+            
+            <div id="contenedorReseña" style="display: none; padding: 15px 3%; background-color: #FFFDE7;">
+                <label for="reseñaCliente" style="display: block; margin-bottom: 10px; color: var(--color-text); font-weight: 700;">✍️ ¡Cuéntanos qué te pareció la aventura!</label>
+                <textarea id="reseñaCliente" placeholder="Nos ayudas a mejorar para la próxima misión..."></textarea>
+                <div style="display: flex; justify-content: space-between; margin-top: 10px;">
+                    <button type="button" class="opcion-btn" onclick="animateButton(this); ocultarReseñaForm()" style="background-color: var(--accent-red);">Cancelar</button>
+                    <button class="primary-btn" onclick="animateButton(this); guardarReseña()" style="margin-top: 0; width: 70%; background-color: var(--color-uis-green);">¡Enviar Mensaje Secreto! 📬</button>
+                </div>
+            </div>
+
+        </div>
+        
+    </div> 
+    
+    <button id="exportarBtn" class="primary-btn" onclick="descargarCSV()" style="position: fixed; bottom: 10px; left: 10px; opacity: 0.2; margin: 0; background-color: #7986CB;">📊 CSV (Adultos)</button>
+
+    <script>
+
+        // *************************************
+        // ********** FUNCIÓN DE ANIMACIÓN Y UTILIDADES DE ESPACIO ***********
+        // *************************************
+        function animateButton(buttonElement) {
+            buttonElement.classList.add('clicked');
+            
+            setTimeout(() => {
+                buttonElement.classList.remove('clicked');
+            }, 200); 
+        }
+
+        function toggleAccionesMenu() {
+            const menu = document.getElementById('controlesSuperiores');
+            menu.classList.toggle('active');
+            
+            // Si el menú se cierra y la reseña estaba visible, la ocultamos
+            if (!menu.classList.contains('active') && document.getElementById('contenedorReseña').style.display === 'block') {
+                 ocultarReseñaForm();
+            }
+        }
+        
+        // *************************************
+        // ********** DICCIONARIO CONVERSACIONAL INFANTIL ***********
+        // *************************************
+        const conversationalData = {
+          "intents": {
+            "saludo": [
+              "¡Hola, pequeño explorador! 🌟 ¿Estás listo para aprender de la UIS?",
+              "¡Qué gusto! Soy el amigo robot de la UIS. ¿En qué te ayudo hoy?",
+              "¡Hola, hola! Soy tu asistente. ¡Pregúntame lo que quieras!"
+            ],
+            "como_estas": [ 
+              "¡Soy un robot muy feliz! 🎉 Siempre estoy recargado para ayudarte. ¿Y tú, cómo te sientes hoy?",
+              "¡Súper bien, gracias! Estoy con mis circuitos al máximo. ¿Qué tesoros quieres encontrar?",
+              "Funcionando perfectamente. Mi única misión es ser tu guía. ¿Empezamos la búsqueda?"
+            ],
+            "que_haces": [
+              "Soy un robot especial que te cuenta todos los secretos de la Universidad UIS, como sus juegos, su historia y dónde está.",
+              "Mi trabajo es ser un libro mágico: me preguntas y te doy la respuesta sobre la UIS. ¡Soy tu ayuda de la universidad!",
+              "Estoy buscando datos geniales de la UIS. ¿Sobre qué quieres que te cuente ahora?"
+            ],
+            "despedida": [
+              "¡Adiós, súper campeón! Vuelve pronto para otra misión. 👋",
+              "¡Chao! Que tengas un día lleno de diversión.",
+              "¡Hasta la próxima aventura! ¡No olvides lo que aprendiste!"
+            ],
+            "horario": [
+              "El horario de la oficina mágica es de **lunes a viernes de 8 de la mañana hasta las 6 de la tarde**. ¡Pide a un adulto que te acompañe en ese horario!",
+              "La universidad abre de 8 a.m. a 6 p.m., ¡es como el horario del cole pero de oficina! 🏫"
+            ],
+            "carreras_oferta": [
+              "La UIS tiene **muchos juegos grandes para estudiar**! Hay para ser inventor (Ingeniería), doctor de animales (Zootecnia) y hasta un súper jefe (Administración). ¿Cuál te gusta más?",
+              "Tenemos muchas formas de aprender y jugar de grandes. ¡Son como clases súper avanzadas! Mira más en la página web oficial."
+            ],
+            "default": [
+              "¡Oops! 🤔 Esa pregunta no está en mi libro mágico de la UIS. ¿Puedes preguntarme sobre **historia, juegos o dónde está la sede**?",
+              "¡No sé la respuesta! Lo siento. Solo sé cosas de la universidad. ¡Pregúntame algo más fácil! 😉"
+            ],
+            "agradecimiento": [
+              "¡De nada, aventurero! Es un placer ayudarte a descubrir la UIS. 😊",
+              "¡Con gusto! ¡Me alegra ser tu ayudante favorito!"
+            ],
+            "ayuda": [
+              "¡Claro que sí! Soy tu botón de ayuda. Dime, ¿qué quieres saber de la UIS?",
+              "Estoy aquí para ayudarte. ¿Cuál es tu pregunta?"
+            ],
+            "identidad": [
+              "Soy un **robot asistente** hecho especialmente para contarte cosas de la UIS. ¡Soy tu amigo digital! 🤖",
+              "Soy el chatbot, tu guía en el mundo de la Universidad Industrial de Santander."
+            ],
+            // *** RESPUESTAS AMPLIADAS ***
+            "quien_eres_detallado": [
+                "¡Soy un proyecto de los **estudiantes de la UIS Saravena**! Ellos me crearon para que niños como tú puedan saber rápido todo sobre su universidad. Mi misión es enseñar y divertir. 🥳"
+            ],
+            "que_puedes_hacer": [
+                "Puedo contarte el **secreto de la UIS** (Historia), qué **juegos grandes tienen para estudiar** (Carreras), a **qué hora abren** (Horarios) y **dónde está el tesoro** (Ubicación). ¡Dime qué quieres explorar!"
+            ],
+            "faq_general": [
+                "Solo sé de la Universidad Industrial de Santander. Si quieres saber de **admisiones, carreras, contacto o historia**, soy el mejor robot para eso. ¡Inténtalo!"
+            ],
+            "elogio_bot": [
+              "¡Gracias! ¡Me has dado un punto de energía extra! ✨",
+              "¡Qué amable eres! Hago mi mejor esfuerzo para ser un súper asistente. 💪"
+            ],
+            "contacto": [
+              "Para hablar con los adultos de la UIS, diles que llamen al **+57 322 7565651** o que envíen un correo a **jecasmar@uis.edu.co**.",
+              "El teléfono es 322 7565651 y el correo jecasmar@uis.edu.co. ¡Estos son los caminos para contactar a los profesores!"
+            ],
+            "ubicacion": [
+              "¡El gran castillo de la UIS está en **Saravena, Arauca**! Es un lugar enorme lleno de aventuras. 🗺️",
+              "La sede principal es en Saravena. ¡Busca el mapa con un adulto!"
+            ],
+            "historia_creacion": [
+              "La UIS es muy vieja... ¡nació en el año **1944**! Fue como una gran idea para que la gente de Santander pudiera aprender a ser inventora y hacer cosas increíbles. ¡Feliz cumpleaños, UIS! 🎂"
+            ],
+             "historia_fundador": [
+              "El valiente que tuvo la idea fue el **Dr. Gustavo Rojas Pinilla** cuando era gobernador. ¡Fue un gran amigo de la educación!",
+            ],
+            "mision_vision": [
+              "El **Súper Poder (Misión)** es enseñar a los jóvenes a ser muy buenos profesionales. Y el **Sueño (Visión)** es ser la universidad más genial y la mejor de Colombia. 🏆"
+            ]
+          },
+          "keywords": {
+            "saludo": [
+              "hola",
+              "buenas",
+              "saludos"
+            ],
+            // INTENCIÓN DE ESTADO REFORZADA (más específica)
+            "como_estas": [
+              "cómo estás",
+              "como estas", 
+              "como has estado",
+              "que tal te va",
+              "que tal",
+              "cómo te encuentras"
+            ],
+            // INTENCIÓN DE FUNCIÓN
+            "que_haces": [
+              "que haces",
+              "a que te dedicas",
+              "cual es tu trabajo",
+              "que me puedes decir"
+            ],
+            "despedida": [
+              "adiós",
+              "chao",
+              "hasta luego",
+              "me voy"
+            ],
+            "horario": [
+              "horario",
+              "hora",
+              "abren",
+              "cierran",
+              "atención"
+            ],
+            "carreras_oferta": [
+              "carrera",
+              "programa",
+              "estudio",
+              "que ofrecen",
+              "oferta académica"
+            ],
+            "agradecimiento": [
+              "gracias",
+              "muchas gracias",
+              "te lo agradezco"
+            ],
+            "ayuda": [
+              "ayuda",
+              "necesito ayuda",
+              "soporte"
+            ],
+            "identidad": [
+              "quién eres",
+              "como te llamas",
+              "eres un bot",
+              "tu nombre"
+            ],
+            // *** PALABRAS CLAVE AMPLIADAS ***
+            "quien_eres_detallado": [
+                "quien te creo",
+                "cual es tu proposito",
+                "eres un programa",
+                "eres un chatbot"
+            ],
+            "que_puedes_hacer": [
+                "que puedes hacer",
+                "que sabes",
+                "cuales son tus funciones",
+                "como me ayudas"
+            ],
+            "faq_general": [
+                "preguntas frecuentes",
+                "faq",
+                "otras preguntas",
+                "sobre que sabes"
+            ],
+            // ******************************
+            "elogio_bot": [
+              "buen trabajo",
+              "eres genial",
+              "eres el mejor"
+            ],
+            "contacto": [
+              "contacto",
+              "teléfono",
+              "llamar",
+              "correo",
+              "email",
+              "número"
+            ],
+            "ubicacion": [
+              "ubicación",
+              "donde están",
+              "dirección",
+              "sede",
+              "lugar"
+            ],
+             "historia_creacion": [
+              "cuando se creó",
+              "fundación",
+              "fecha de creación",
+              "origen uis",
+              "ordenanza 38"
+            ],
+             "historia_fundador": [
+              "quien la fundó",
+              "fundador",
+              "quién creó",
+              "creador uis"
+            ],
+            "mision_vision": [
+              "misión",
+              "mision",
+              "visión",
+              "vision",
+              "propósito",
+              "objetivo de la uis"
+            ]
+          }
+        };
+
+        // *************************************
+        // ********** MAPA DE DATOS DETALLADOS INFANTIL ************
+        // *************************************
+        const infoMap = {
+            "horario": {
+                titulo: "⏰ Horario del Castillo UIS",
+                cuerpo: "El castillo está abierto para los adultos:<ul><li>**Lunes a Viernes:** ¡De sol a sol! (8:00 AM a 6:00 PM)</li><li>**Sábados:** Un ratito por la mañana. (9:00 AM a 5:00 PM)</li></ul><p>¡Pero puedes preguntar al robot a cualquier hora! 🌙</p>"
+            },
+            "carreras_oferta": {
+                titulo: "📚 ¡Los Súper Juegos de Aprender!",
+                cuerpo: "¡Puedes convertirte en lo que quieras! Tenemos juegos para:<ul><li>**Ingeniero Mágico** (Inteligencia Artificial)</li><li>**Veterinario Asombroso** (Zootecnia)</li><li>**Súper Gerente** (Administración Agropecuaria)</li></ul><p style='text-align: center;'><a href='https://uis.edu.co/es/' target='_blank'>**¡Pídele a un adulto que vea todos los juegos aquí!**</a></p>"
+            },
+            "ubicacion": {
+                titulo: "🗺️ ¿Dónde está el Gran Tesoro?",
+                cuerpo: "<p>¡El tesoro de la UIS está escondido en **Saravena, Arauca**!</p><p style='text-align: center;'><a href='https://maps.google.com/?cid=17075253050066749818&g_mp=CiVnb29nbGUubWFwcy5wbGFjZXMudjEuUGxhY2VzLkdldFBsYWNl' target='_blank'>**¡Mira el mapa con un adulto!**</a></p>"
+            },
+            "contacto": {
+                titulo: "🗣️ La Línea Secreta",
+                cuerpo: "Para hablar con los adultos que cuidan la UIS, diles que llamen al **+57 322 7565651** o que envíen un mensaje a **jecasmar@uis.edu.co**.",
+            },
+            "historia_creacion": {
+                titulo: "🎂 El Cumpleaños de la UIS",
+                cuerpo: "La UIS es una abuelita genial. ¡Empezó en el año **1944**! Nació porque querían que todos pudieran ser inventores y científicos en la región. ¡Es una historia de héroes!",
+            },
+            "mision_vision": {
+                titulo: "✨ El Súper Poder y el Gran Sueño",
+                cuerpo: "El **Súper Poder (Misión)** es hacer que todos los estudiantes sean los mejores profesionales del mundo. El **Gran Sueño (Visión)** es ser la universidad más reconocida, ¡como ganar una copa mundial! 🏆"
+            }
+        };
+
+        // *************************************
+        // ********** LÓGICA CORE DEL CHATBOT ************
+        // *************************************
+        
+        let ultimoUsuario = null; 
+        const registrosUsuarios = JSON.parse(localStorage.getItem('registrosUsuarios')) || []; 
+        const CODIGO_SECRETO = "admin123";
+
+        function displayBotResponse(cuerpo, titulo, showOptions = true) {
+            const historialChat = document.getElementById('historialChat');
+            const botHtml = `
+                <div class="chat-bot">
+                    <h4>${titulo}</h4>
+                    <p>${cuerpo}</p>
+                    ${showOptions ? `
+                    <div class="acciones-post-respuesta" style="margin-top: 10px; padding-top: 5px; border-top: 1px dashed #B3E5FC; text-align: right;">
+                        <label style="font-size: 0.9em; font-weight: 500; color: var(--color-text-secondary); margin-right: 10px;">¿Otra misión para mí? 🧐</label>
+                        <button class="opcion-btn" onclick="animateButton(this); mostrarOpciones()" style="background-color: var(--accent-blue); box-shadow: 0 3px 0 #1976D2; border-color: var(--accent-blue);">¡Ver Mapas! 🗺️</button>
+                    </div>
+                    ` : ''}
+                </div>
+            `;
+            historialChat.innerHTML += botHtml;
+            historialChat.scrollTop = historialChat.scrollHeight;
+        }
+
+        function buscarRespuesta(mensaje) {
+            const mensajeMinusculas = mensaje.toLowerCase().trim();
+            
+            for (const intent in conversationalData.keywords) {
+                const keywords = conversationalData.keywords[intent];
+                for (const keyword of keywords) {
+                    if (mensajeMinusculas.includes(keyword)) {
+                        
+                        // Si la intención tiene un mapa de información detallada (como los botones)
+                        if (intent in infoMap) {
+                            return { intent: intent, isDetailed: true };
+                        }
+                        
+                        // Si la intención tiene una respuesta simple en el diccionario
+                        if (conversationalData.intents[intent]) {
+                            const responses = conversationalData.intents[intent];
+                            const responseText = responses[Math.floor(Math.random() * responses.length)];
+                            return { intent: intent, response: responseText, isDetailed: false };
+                        }
+                    }
+                }
+            }
+
+            const defaultResponses = conversationalData.intents.default;
+            const defaultResponse = defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+            return { intent: "default", response: defaultResponse, isDetailed: false };
+        }
+
+        function enviarMensaje() {
+            const inputElement = document.getElementById('inputMensaje');
+            const mensaje = inputElement.value.trim();
+            inputElement.value = ''; 
+            
+            if (mensaje === "") return; 
+
+            const historialChat = document.getElementById('historialChat');
+            const userHtml = `<div class="chat-user">${mensaje}</div>`;
+            historialChat.innerHTML += userHtml;
+            historialChat.scrollTop = historialChat.scrollHeight;
+            
+            const resultado = buscarRespuesta(mensaje);
+
+            if (resultado.isDetailed) {
+                procesarRespuestaBot(resultado.intent);
+            } else {
+                let titulo = "Asistente Robot 🤖";
+                if (resultado.intent === "default") {
+                    titulo = "🤔 ¡No está en el mapa! 🚩";
+                } else if (resultado.intent === 'quien_eres_detallado' || resultado.intent === 'que_puedes_hacer' || resultado.intent === 'que_haces') {
+                     titulo = "¡Mi Tarjeta de Identidad! 🔖"; 
+                } else if (resultado.intent === 'como_estas' || resultado.intent === 'saludo' || resultado.intent === 'elogio_bot') { 
+                     titulo = "¡Saludos de Amigos! 👋";
+                }
+                const cuerpo = resultado.response.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                displayBotResponse(cuerpo, titulo, true);
+            }
+        }
+
+        function procesarRespuestaBot(optionValue) {
+            let titulo = "Asistente Robot 🤖";
+            let cuerpo = "";
+            let mostrarOpcionesBoton = true;
+            
+            if (optionValue in infoMap) {
+                const info = infoMap[optionValue];
+                titulo = info.titulo;
+                cuerpo = info.cuerpo.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                mostrarOpcionesBoton = true;
+            } else {
+                 if (optionValue in conversationalData.intents) {
+                     titulo = (optionValue === 'faq_general' || optionValue === 'quien_eres_detallado' || optionValue === 'que_puedes_hacer' || optionValue === 'que_haces') ? "¡Mi Tarjeta de Identidad! 🔖" :
+                              (optionValue === 'como_estas' || optionValue === 'saludo' || optionValue === 'elogio_bot') ? "¡Saludos de Amigos! 👋" : "¡Secreto de la UIS! 🤫";
+                     const responses = conversationalData.intents[optionValue];
+                     cuerpo = responses[Math.floor(Math.random() * responses.length)].replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+                     mostrarOpcionesBoton = true;
+                 } else {
+                    const defaultResponses = conversationalData.intents.default;
+                    titulo = "🤔 ¡No está en el mapa! 🚩";
+                    cuerpo = defaultResponses[Math.floor(Math.random() * defaultResponses.length)];
+                    mostrarOpcionesBoton = false;
+                 }
+            }
+
+            displayBotResponse(cuerpo, titulo, mostrarOpcionesBoton);
+        }
+
+        function procesarSeleccion(optionValue, optionText) {
+            
+            const historialChat = document.getElementById('historialChat');
+
+            const userHtml = `<div class="chat-user">${optionText}</div>`;
+            historialChat.innerHTML += userHtml;
+            historialChat.scrollTop = historialChat.scrollHeight;
+            
+            procesarRespuestaBot(optionValue);
+        }
+
+        // *************************************
+        // ********** FUNCIONES DE INTERFAZ ************
+        // *************************************
+
+        function manejarEnter(event) {
+            if (event.key === 'Enter') {
+                document.getElementById('btnEnviar').click(); 
+                return false; 
+            }
+            return true;
+        }
+        
+        function actualizarSaludoInicial(nombre) {
+            const initialGreeting = document.getElementById('initial-greeting');
+            
+            initialGreeting.innerHTML = `
+                <h4>¡Hola, ${nombre}! 👋 Soy tu Explorador UIS</h4>
+                <p>¡Me alegra tener un nuevo compañero! Soy un robot hecho para contarte todos los secretos de la UIS. ¡Busquemos juntos los tesoros de **historia**, **juegos de aprender** y **contacto**!</p>
+            `;
+        }
+
+        function iniciarMenu() {
+            const nombre = document.getElementById('nombreUsuario').value.trim();
+            // CAMBIO CLAVE: Obtener la edad
+            const edadInput = document.getElementById('edadUsuario');
+            const edad = edadInput.value.trim();
+            const autorizado = document.getElementById('checkAutorizacion').checked;
+            
+            if (nombre === "") { 
+                mostrarAlertaInline("❌ ¡Escribe tu nombre para empezar la aventura!."); 
+                return;
+            }
+            
+            // VALIDACIÓN DE EDAD
+            const edadNum = parseInt(edad);
+            if (isNaN(edadNum) || edadNum < 1 || edadNum > 15) {
+                mostrarAlertaInline("❌ ¡Escribe tu edad! Debe ser un número entre 1 y 15 (pide ayuda a un adulto si es necesario)."); 
+                return;
+            }
+            
+            if (!autorizado) {
+                 mostrarAlertaInline("❌ ¡Debes dar permiso para que el robot guarde tu nombre! (Con permiso de un adulto)."); 
+                 return;
+            }
+            
+            const nuevoRegistro = {
+                nombre: nombre,
+                edad: edad, // Se guarda la edad
+                reseña: ""
+            };
+
+            registrosUsuarios.push(nuevoRegistro);
+            localStorage.setItem('registrosUsuarios', JSON.stringify(registrosUsuarios));
+            
+            ultimoUsuario = nuevoRegistro; 
+            
+            document.getElementById('cuestionario').style.display = 'none';
+            document.getElementById('contenedorMenu').style.display = 'flex'; 
+            
+            actualizarSaludoInicial(nombre); 
+            
+            document.getElementById('historialChat').scrollTop = document.getElementById('historialChat').scrollHeight;
+        }
+
+        function volverAlInicio() {
+            document.getElementById('contenedorMenu').style.display = 'none';
+            document.getElementById('cuestionario').style.display = 'block'; 
+            limpiarChat(true); 
+            ocultarReseñaForm();
+        }
+        
+        function limpiarChat(isFullReset = false) {
+            const historialChat = document.getElementById('historialChat');
+            
+            if (isFullReset) {
+                 historialChat.innerHTML = `<div class="chat-bot" id="initial-greeting"></div>`;
+                 if (ultimoUsuario && ultimoUsuario.nombre) {
+                    actualizarSaludoInicial(ultimoUsuario.nombre);
+                 } else {
+                     actualizarSaludoInicial("Invitado");
+                 }
+            } else {
+                historialChat.innerHTML = document.getElementById('initial-greeting').outerHTML;
+            }
+            
+            historialChat.scrollTop = historialChat.scrollHeight;
+            
+            document.getElementById('controlesSuperiores').classList.remove('active');
+        }
+        
+        function mostrarAlertaInline(mensaje, esError = true) {
+            const alerta = document.getElementById('alerta-inline');
+            if (document.getElementById('cuestionario').style.display !== 'none') {
+                alerta.textContent = mensaje;
+                alerta.style.display = 'block';
+                alerta.style.backgroundColor = esError ? '#FFCDD2' : '#C8E6C9'; 
+                alerta.style.color = esError ? '#D32F2F' : '#388E3C'; 
+            }
+        }
+        
+        function mostrarOpciones() {
+            const historialChat = document.getElementById('historialChat');
+            
+            const botHtml = `
+                <div class="chat-bot">
+                    <h4>Asistente Robot 🤖</h4>
+                    <p>¡Aquí están los botones de misión otra vez! 👇 Escoge uno o escribe lo que quieras saber.</p>
+                </div>
+            `;
+            historialChat.innerHTML += botHtml;
+            historialChat.scrollTop = historialChat.scrollHeight;
+        }
+
+        function mostrarReseñaForm() {
+            document.getElementById('opcionesFooter').style.display = 'none';
+            document.getElementById('contenedorReseña').style.display = 'block';
+        }
+        
+        function ocultarReseñaForm() {
+            document.getElementById('contenedorReseña').style.display = 'none';
+            document.getElementById('opcionesFooter').style.display = 'flex';
+            document.getElementById('reseñaCliente').value = ''; 
+        }
+
+        function mostrarAlerta(mensaje) {
+            const alertaCSV = document.getElementById('exportarBtn');
+            alertaCSV.textContent = mensaje;
+            alertaCSV.style.opacity = 1;
+            alertaCSV.style.backgroundColor = '#4CAF50'; 
+             setTimeout(() => {
+                alertaCSV.style.opacity = 0.2;
+                alertaCSV.textContent = '📊 CSV (Adultos)';
+            }, 5000);
+        }
+
+        function guardarReseña() {
+            const reseña = document.getElementById('reseñaCliente').value.trim();
+            if (reseña === "") {
+                mostrarAlerta("¡El mensaje secreto está vacío! Escribe algo.");
+                return;
+            }
+            
+            if (!ultimoUsuario) { 
+                mostrarAlerta("Error: No sé quién eres. ¡Vuelve a empezar la aventura!"); 
+                return; 
+            }
+            
+            let reseñaLimpia = reseña.replace(/,/g, ";").replace(/\n/g, " ");
+            ultimoUsuario.reseña = reseñaLimpia;
+            
+            // Buscar por nombre y edad (en lugar de nombre y teléfono)
+            const index = registrosUsuarios.findIndex(r => r.nombre === ultimoUsuario.nombre && r.edad === ultimoUsuario.edad);
+            if (index !== -1) {
+                registrosUsuarios[index].reseña = reseñaLimpia;
+                localStorage.setItem('registrosUsuarios', JSON.stringify(registrosUsuarios));
+            } else {
+                 mostrarAlerta("Error al guardar: ¡Perdí tu registro!.");
+                 return;
+            }
+
+            ocultarReseñaForm();
+            mostrarAlerta("✅ ¡Mensaje Secreto Enviado! ¡Gracias, súper explorador!"); 
+        }
+
+        function descargarCSV() {
+            const password = prompt("Introduce el código secreto para descargar la lista (¡Solo adultos!):");
+            if (password !== CODIGO_SECRETO) {
+                 mostrarAlerta("❌ Código incorrecto. ¡Atrás, villano!");
+                 return;
+            }
+            
+            if (registrosUsuarios.length === 0) { mostrarAlerta("No hay datos para exportar."); return; }
+            
+            // Encabezado del CSV: Nombre_Usuario,Edad,Reseña
+            const encabezado = "Nombre_Usuario,Edad,Reseña\n";
+            let filasCSV = "";
+            
+            registrosUsuarios.forEach(registro => {
+                const nombre = registro.nombre || "";
+                const edad = registro.edad || ""; // Usar la edad
+                const reseña = registro.reseña ? `"${registro.reseña.replace(/"/g, '""').replace(/\n/g, ' ')}"` : "Sin reseña"; 
+                
+                filasCSV += `"${nombre}",${edad},${reseña}\n`; // Se quitan las comillas de la edad para que sea numérico en CSV
+            });
+            
+            const blob = new Blob([encabezado + filasCSV], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            link.href = URL.createObjectURL(blob);
+            link.setAttribute('download', 'datos_exploradores_uis.csv');
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            mostrarAlerta("✅ ¡Exportación del Mapa de Datos exitosa!");
+        }
+
+    </script>
+
+</body>
+</html>
